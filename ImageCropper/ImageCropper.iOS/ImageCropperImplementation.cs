@@ -51,9 +51,19 @@ namespace Stormlion.ImageCropper.iOS
                 UIApplication.SharedApplication.KeyWindow.RootViewController.DismissViewController(true, null);
             };
 
-            UIApplication.SharedApplication.KeyWindow.RootViewController.PresentViewController(cropViewController, true, null);
+            //UIApplication.SharedApplication.KeyWindow.RootViewController.PresentViewController(cropViewController, true, null);
+            // Patch for Modal iOS: https://github.com/stormlion227/ImageCropper.Forms/issues/22
+            UIWindow window = UIApplication.SharedApplication.KeyWindow;
+			UIViewController viewController = window.RootViewController;
 
-            if (!string.IsNullOrWhiteSpace(imageCropper.PageTitle) && cropViewController.TitleLabel != null)
+			while (viewController.PresentedViewController != null)
+			{
+				viewController = viewController.PresentedViewController;
+			}
+			viewController.PresentViewController(cropViewController, true, null);
+            // end on iOS Modal patch
+
+			if (!string.IsNullOrWhiteSpace(imageCropper.PageTitle) && cropViewController.TitleLabel != null)
             {
                 UILabel titleLabel = cropViewController.TitleLabel;
                 titleLabel.Text = imageCropper.PageTitle;
